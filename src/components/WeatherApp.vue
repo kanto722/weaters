@@ -69,6 +69,7 @@ export default {
             "cities",
             JSON.stringify(this.info.map((item) => item.name))
           );
+          return this.query = ""
         })
         .catch((err) => {
           console.log(err);
