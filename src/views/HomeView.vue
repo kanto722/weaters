@@ -1,15 +1,15 @@
 <template>
-  <hello-world />
+  <weather-app />
 </template>
 
 <script>
-  import HelloWorld from '../components/HelloWorld'
+  import WeatherApp from '../components/WeatherApp'
 
   export default {
     name: 'HomeView',
 
     components: {
-      HelloWorld,
+      WeatherApp,
     },
   }
 </script>

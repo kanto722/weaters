@@ -47,7 +47,7 @@
 <script>
 import { getWeatherByCity } from "@/services/weather";
 export default {
-  name: "HelloWorld",
+  name: "WeatherApp",
 
   data() {
     return {
