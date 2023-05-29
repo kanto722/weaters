@@ -14,21 +14,24 @@
           variant="tonal"
           v-for="card in info"
           :key="card.id"
-          class="card d-flex flex-column justify-center align-center pa-2"
+          class="card d-flex flex-column justify-space-between align-center pa-2"
         >
           <v-card-title>г. {{ card.name }}</v-card-title>
           <v-card-text>
-            <div>
-              <span v-if="card.main.temp"
-                >Температура {{ card?.main?.temp.toFixed(0) }}</span
-              >
-              <span v-else></span>
+            <div v-if="card.main.temp">
+              <span>Температура {{ card?.main?.temp.toFixed(0) }}</span>
             </div>
-            <div>Влажность воздуха {{ card?.main?.humidity }}%</div>
-            <div>Скорость ветра {{ card?.wind?.speed.toFixed(0) }}м/с</div>
-            <div>Облачность {{ card?.clouds?.all }} %</div>
-            <div class="d-flex justify-center align-center">
-              {{ card.weather[0].main }}
+            <div v-if="card.main.humidity">
+              <span>Влажность воздуха {{ card?.main?.humidity }}%</span>
+            </div>
+            <div v-if="card.wind.speed">
+              <span>Скорость ветра {{ card?.wind?.speed.toFixed(0) }}м/с</span>
+            </div>
+            <div v-if="card.clouds.all">
+              <span>Облачность {{ card?.clouds?.all }} %</span>
+            </div>
+            <div v-if="card.weather[0].description" class="d-flex justify-center flex-column align-center">
+              <span>{{ card?.weather[0]?.description }}</span>
               <img
                 :src="`https://openweathermap.org/img/wn/${card?.weather[0]?.icon}.png`"
                 alt=""
