@@ -1,88 +1,134 @@
 <template>
   <v-container>
-    <v-row class="text-center">
-      <v-col cols="12">
-        <v-img
-          :src="require('../assets/logo.svg')"
-          class="my-3"
-          contain
-          height="200"
-        />
-      </v-col>
-
-      <v-col class="mb-4">
-
-      </v-col>
-
-      <v-col
-        class="mb-5"
-        cols="12"
-      >
-      </v-col>
-      <v-col
-        class="mb-5"
-        cols="12"
-      >
+    <v-row
+      class="text-center d-flex flex-column justify-center"
+      style="gap: 10px"
+    >
+      {{ dateBuilder() }}
+      <form action="#" @submit="axiosWeather">
+        <input type="text" placeholder="Введите город" v-model="query" />
+        <v-btn type="submit">кнопка</v-btn>
+      </form>
+      <v-col cols="12 d-flex flex-wrap justify-center" style="gap: 20px">
+        <v-card
+          variant="tonal"
+          v-for="card in info"
+          :key="card.id"
+          class="card d-flex flex-column justify-center align-center pa-2"
+        >
+          <v-card-title>г. {{ card.name }}</v-card-title>
+          <v-card-text>
+            <div>
+              <span v-if="card.main.temp"
+                >Температура {{ card?.main?.temp.toFixed(0) }}</span
+              >
+              <span v-else></span>
+            </div>
+            <div>Влажность воздуха {{ card?.main?.humidity }}%</div>
+            <div>Скорость ветра {{ card?.wind?.speed.toFixed(0) }}м/с</div>
+            <div>Облачность {{ card?.clouds?.all }} %</div>
+            <div class="d-flex justify-center align-center">
+              {{ card.weather[0].main }}
+              <img
+                :src="`https://openweathermap.org/img/wn/${card?.weather[0]?.icon}.png`"
+                alt=""
+              />
+            </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click="deleteCity(card.name)">Удалить</v-btn>
+          </v-card-actions>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-  export default {
-    name: 'HelloWorld',
+import { getWeatherByCity } from "@/services/weather";
+export default {
+  name: "HelloWorld",
 
-    data: () => ({
-      ecosystem: [
-        {
-          text: 'vuetify-loader',
-          href: 'https://github.com/vuetifyjs/vuetify-loader',
-        },
-        {
-          text: 'github',
-          href: 'https://github.com/vuetifyjs/vuetify',
-        },
-        {
-          text: 'awesome-vuetify',
-          href: 'https://github.com/vuetifyjs/awesome-vuetify',
-        },
-      ],
-      importantLinks: [
-        {
-          text: 'Documentation',
-          href: 'https://vuetifyjs.com',
-        },
-        {
-          text: 'Chat',
-          href: 'https://community.vuetifyjs.com',
-        },
-        {
-          text: 'Made with Vuetify',
-          href: 'https://madewithvuejs.com/vuetify',
-        },
-        {
-          text: 'Twitter',
-          href: 'https://twitter.com/vuetifyjs',
-        },
-        {
-          text: 'Articles',
-          href: 'https://medium.com/vuetify',
-        },
-      ],
-      whatsNext: [
-        {
-          text: 'Explore components',
-          href: 'https://vuetifyjs.com/components/api-explorer',
-        },
-        {
-          text: 'Select a layout',
-          href: 'https://vuetifyjs.com/getting-started/pre-made-layouts',
-        },
-        {
-          text: 'Frequently Asked Questions',
-          href: 'https://vuetifyjs.com/getting-started/frequently-asked-questions',
-        },
-      ],
-    }),
-  }
+  data() {
+    return {
+      query: "",
+      info: [],
+    };
+  },
+
+  methods: {
+    axiosWeather(e) {
+      e.preventDefault();
+      getWeatherByCity(this.query)
+        .then((result) => {
+          this.info = this.info.concat(result);
+          localStorage.setItem(
+            "cities",
+            JSON.stringify(this.info.map((item) => item.name))
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    weatherRequest() {
+      const citiesString = localStorage.getItem("cities");
+      const cities = JSON.parse(citiesString);
+      if (cities?.length) {
+        Promise.all(cities.map(getWeatherByCity))
+          .then((result) => {
+            this.info = result;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+    deleteCity(city) {
+      this.info = this.info.filter((item) => item.name !== city);
+      localStorage.setItem(
+        "cities",
+        JSON.stringify(this.info.map((item) => item.name))
+      );
+    },
+    dateBuilder() {
+      let d = new Date();
+      let months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      let day = days[d.getDay()];
+      let date = d.getDate();
+      let month = months[d.getMonth()];
+      let year = d.getFullYear();
+      return `${day} ${date} ${month} ${year}`;
+    },
+  },
+  mounted() {
+    this.weatherRequest();
+    setInterval(() => {
+      this.weatherRequest();
+    }, 100000);
+  },
+};
 </script>
