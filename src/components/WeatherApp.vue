@@ -30,7 +30,10 @@
             <div v-if="card.clouds.all">
               <span>Облачность {{ card?.clouds?.all }} %</span>
             </div>
-            <div v-if="card.weather[0].description" class="d-flex justify-center flex-column align-center">
+            <div
+              v-if="card.weather[0].description"
+              class="d-flex justify-center flex-column align-center"
+            >
               <span>{{ card?.weather[0]?.description }}</span>
               <img
                 :src="`https://openweathermap.org/img/wn/${card?.weather[0]?.icon}.png`"
@@ -62,6 +65,13 @@ export default {
   methods: {
     axiosWeather(e) {
       e.preventDefault();
+      const cityString = this.info.map((item) => item.name);
+      console.log(this.query);
+      console.log(cityString);
+      const findCity = cityString.find((elem) => elem === this.query);
+      if(findCity){
+        return alert('такое есть')
+      }
       getWeatherByCity(this.query)
         .then((result) => {
           this.info = this.info.concat(result);
@@ -69,7 +79,7 @@ export default {
             "cities",
             JSON.stringify(this.info.map((item) => item.name))
           );
-          return this.query = ""
+          this.query = "";
         })
         .catch((err) => {
           console.log(err);
