@@ -24,7 +24,6 @@
           class="card d-flex flex-column justify-space-between align-center pa-2"
           style="max-width: 280px"
         >
-        {{card}}
           <card-component
             :name="card.name"
             :temp="card?.main?.temp"
