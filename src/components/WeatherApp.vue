@@ -7,6 +7,13 @@
       {{ dateBuilder() }}
       <form action="#" @submit="axiosWeather">
         <input type="text" placeholder="Введите город" v-model="query" />
+        <v-select
+            label="Температура в Градусах"
+            :items="units"
+            :item-text="'label'"
+            variant="solo-inverted"
+            name="unit"
+          ></v-select>
         <v-btn type="submit">кнопка</v-btn>
       </form>
       <v-col cols="12 d-flex flex-wrap justify-center" style="gap: 20px">
@@ -15,6 +22,7 @@
           v-for="card in info"
           :key="card.id"
           class="card d-flex flex-column justify-space-between align-center pa-2"
+          style="max-width: 280px"
         >
           <v-card-title>г. {{ card.name }}</v-card-title>
           <v-card-text>
@@ -59,6 +67,11 @@ export default {
     return {
       query: "",
       info: [],
+      units: [
+        { value: "standart", label: "Келивин" },
+        { value: "imperial", label: "Фаренгейт" },
+        { value: "metric", label: "Цельсия" },
+      ],
     };
   },
 
@@ -66,13 +79,14 @@ export default {
     axiosWeather(e) {
       e.preventDefault();
       const cityString = this.info.map((item) => item.name);
-      console.log(this.query);
-      console.log(cityString);
       const findCity = cityString.find((elem) => elem === this.query);
-      if(findCity){
-        return alert('такое есть')
+      const formData = new FormData(e.target);
+      const unit = formData.get('unit')
+
+      if (findCity) {
+        return alert("Город уже показан в карточке");
       }
-      getWeatherByCity(this.query)
+      getWeatherByCity(this.query, unit )
         .then((result) => {
           this.info = this.info.concat(result);
           localStorage.setItem(
@@ -90,7 +104,7 @@ export default {
       const citiesString = localStorage.getItem("cities");
       const cities = JSON.parse(citiesString);
       if (cities?.length) {
-        Promise.all(cities.map(getWeatherByCity))
+        Promise.all(cities.map((value) => getWeatherByCity(value)))
           .then((result) => {
             this.info = result;
           })
