@@ -79,7 +79,7 @@ export default {
     axiosWeather(e) {
       e.preventDefault();
       const cityString = this.info.map((item) => item.name);
-      const findCity = cityString.find((elem) => elem === this.query);
+      const findCity = cityString.find((elem) => elem.toLowerCase() === this.query.toLowerCase());
       const formData = new FormData(e.target);
       const unit = formData.get('unit')
 
